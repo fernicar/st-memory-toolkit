@@ -1,0 +1,54 @@
+# Python 编译和打包文件
+*.pyc
+__pycache__/
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# 虚拟环境
+venv/
+env/
+.venv/
+.direnv/
+pip-wheel-metadata/
+.tox/
+
+# 编辑器和IDE文件 (常见)
+.vscode/        # VS Code配置
+.idea/          # PyCharm/IntelliJ IDEA配置
+*.sublime-project
+*.sublime-workspace
+*.DS_Store      # macOS系统文件
+ehcache/        # Eclipse相关
+
+# Jupyter Notebook相关 (如果使用)
+.ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# 测试和覆盖率
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 日志和数据库文件
+*.log
+*.sqlite3
+*.db.sqlite3
+
+# 系统文件
+thumbs.db
+
+# 数据文件夹中的子文件夹
+result/**/
+
+# 密码和敏感信息 (强烈建议)
+.env
+.flaskenv
+*.key
+*.pem
+*.p8
+*.crt
+credentials.json
+token.json
