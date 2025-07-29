@@ -1,125 +1,125 @@
 #!/usr/bin/env python3
 """
-Token计算工具模块
-用于估算文本的token数量
+Token counting utility module
+Used to estimate the number of tokens in a text
 """
 
 import re
 import logging
 
 class TokenCounter:
-    """Token计算器"""
+    """Token counter"""
 
     def __init__(self):
-        """初始化token计算器"""
+        """Initializes the token counter"""
         self.logger = logging.getLogger(__name__)
 
     def estimate_tokens(self, text: str) -> int:
         """
-        估算文本的token数量
+        Estimates the number of tokens in a text
 
-        使用启发式方法估算，适用于中英文混合文本：
-        - 英文单词按1个token计算
-        - 中文字符按1个token计算
-        - 标点符号按0.5个token计算
-        - 数字按0.8个token计算
+        Uses a heuristic method for estimation, suitable for mixed Chinese and English text:
+        - English words are counted as 1 token
+        - Chinese characters are counted as 1 token
+        - Punctuation marks are counted as 0.5 tokens
+        - Numbers are counted as 0.8 tokens
 
         Args:
-            text: 要计算的文本
+            text: The text to be calculated
 
         Returns:
-            估算的token数量
+            The estimated number of tokens
         """
         if not text:
             return 0
 
-        # 统计中文字符
+        # Count Chinese characters
         chinese_chars = len(re.findall(r'[\u4e00-\u9fff]', text))
 
-        # 统计英文单词（连续的字母组合）
+        # Count English words (consecutive letter combinations)
         english_words = len(re.findall(r'[a-zA-Z]+', text))
 
-        # 统计数字
+        # Count numbers
         numbers = len(re.findall(r'\d+', text))
 
-        # 统计标点符号和特殊字符
+        # Count punctuation and special characters
         punctuation = len(re.findall(r'[^\w\s\u4e00-\u9fff]', text))
 
-        # 计算总token数（使用启发式权重）
+        # Calculate the total number of tokens (using heuristic weights)
         total_tokens = (
-            chinese_chars * 1.0 +      # 中文字符
-            english_words * 1.0 +      # 英文单词
-            numbers * 0.8 +            # 数字
-            punctuation * 0.5          # 标点符号
+            chinese_chars * 1.0 +      # Chinese characters
+            english_words * 1.0 +      # English words
+            numbers * 0.8 +            # Numbers
+            punctuation * 0.5          # Punctuation
         )
 
-        # 加上一些基础开销（JSON结构、角色标签等）
-        base_overhead = len(text.split('\n')) * 2  # 每行额外2个token开销
+        # Add some basic overhead (JSON structure, role tags, etc.)
+        base_overhead = len(text.split('\n')) * 2  # 2 extra tokens overhead per line
 
         estimated_tokens = int(total_tokens + base_overhead)
 
-        self.logger.debug(f"文本token估算: 中文{chinese_chars}, 英文{english_words}, "
-                         f"数字{numbers}, 标点{punctuation}, "
-                         f"基础开销{base_overhead}, 总计{estimated_tokens}")
+        self.logger.debug(f"Text token estimation: Chinese {chinese_chars}, English {english_words}, "
+                         f"Numbers {numbers}, Punctuation {punctuation}, "
+                         f"Base overhead {base_overhead}, Total {estimated_tokens}")
 
         return estimated_tokens
 
     def estimate_message_tokens(self, message: dict) -> int:
         """
-        估算单条消息的token数量
+        Estimates the number of tokens in a single message
 
         Args:
-            message: 消息字典，包含role和content字段
+            message: A message dictionary containing role and content fields
 
         Returns:
-            估算的token数量
+            The estimated number of tokens
         """
         role = message.get('role', '')
         content = message.get('content', '')
 
-        # 计算内容token
+        # Calculate content tokens
         content_tokens = self.estimate_tokens(content)
 
-        # 加上角色和结构开销
+        # Add role and structure overhead
         role_tokens = self.estimate_tokens(role)
-        structure_overhead = 10  # JSON结构开销
+        structure_overhead = 10  # JSON structure overhead
 
         total_tokens = content_tokens + role_tokens + structure_overhead
 
-        self.logger.debug(f"消息token估算: 角色'{role}' {role_tokens}token, "
-                         f"内容 {content_tokens}token, 结构开销 {structure_overhead}token, "
-                         f"总计 {total_tokens}token")
+        self.logger.debug(f"Message token estimation: Role '{role}' {role_tokens} tokens, "
+                         f"Content {content_tokens} tokens, Structure overhead {structure_overhead} tokens, "
+                         f"Total {total_tokens} tokens")
 
         return total_tokens
 
     def estimate_messages_tokens(self, messages: list) -> int:
         """
-        估算消息列表的总token数量
+        Estimates the total number of tokens in a list of messages
 
         Args:
-            messages: 消息列表
+            messages: A list of messages
 
         Returns:
-            估算的总token数量
+            The estimated total number of tokens
         """
         total_tokens = 0
         for message in messages:
             total_tokens += self.estimate_message_tokens(message)
 
-        self.logger.debug(f"消息列表token估算: {len(messages)}条消息，总计{total_tokens}token")
+        self.logger.debug(f"Message list token estimation: {len(messages)} messages, total {total_tokens} tokens")
 
         return total_tokens
 
     def estimate_prompt_tokens(self, prompt: str) -> int:
         """
-        估算完整提示词的token数量
+        Estimates the number of tokens in a complete prompt
 
         Args:
-            prompt: 完整的提示词文本
+            prompt: The complete prompt text
 
         Returns:
-            估算的token数量
+            The estimated number of tokens
         """
         tokens = self.estimate_tokens(prompt)
-        self.logger.debug(f"提示词token估算: {tokens}token")
+        self.logger.debug(f"Prompt token estimation: {tokens} tokens")
         return tokens

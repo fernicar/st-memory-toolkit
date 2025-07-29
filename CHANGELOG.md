@@ -1,43 +1,43 @@
 ### v1.0.0
 
-成功把信息储存到表格中，梦开始的地方
+Successfully stored information in the table, the place where the dream began
 
 ### v1.0.1
 
-调整提示词
+Adjusted the prompt
 
-调整存储方式
+Adjusted the storage method
 
 ### v1.0.2
 
-调整提示词，使其更接近酒馆风格(虽然从结果来看没什么用)
+Adjusted the prompt to be closer to the tavern style (although it was useless from the results)
 
-调整多轮对话
+Adjusted multi-turn dialogue
 
 ### v1.0.4
 
-可以正常导入酒馆了
+Can now be imported into the tavern normally
 
 ### v1.0.5
 
-突破了gemini2.5的防御，关键竟然是`processed_prompt = *prompt*.replace('\n', "'\n'")`
+Broke through the defense of gemini2.5, the key was actually `processed_prompt = *prompt*.replace('\n', "'\n'")`
 
 ### v1.0.6
 
-优化多轮对话结构
+Optimized the multi-turn dialogue structure
 
 ### v1.1
 
-新增table_compression
+Added table_compression
 
 ### v1.1.1
 
-优化提示词
+Optimized the prompt
 
 ### v1.1.2
 
-分批处理记忆表格
+Batch processing of memory tables
 
 ### v1.1.3
 
-增加表格与json格式之间的转换
+Added conversion between table and json format

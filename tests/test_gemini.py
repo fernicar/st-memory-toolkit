@@ -1,70 +1,70 @@
 #!/usr/bin/env python3
 """
-Gemini API 测试脚本
+Gemini API Test Script
 """
 
-print("🧠 测试 Google Gemini API 集成...")
+print("🧠 Testing Google Gemini API integration...")
 
 try:
     from src.llm_client import GeminiClient
     from src.table_manager import TableManager
-    from src.prompt_handler import PromptHandler
+    from src.prompt_manager import PromptManager
 
-    print("✅ 模块导入成功")
+    print("✅ Modules imported successfully")
 
-    # 初始化组件
+    # Initialize components
     llm_client = GeminiClient()
-    print(f"✅ Gemini客户端初始化: {'成功' if llm_client.is_available() else '失败'}")
+    print(f"✅ Gemini client initialized: {'Success' if llm_client.is_available() else 'Failed'}")
 
     if llm_client.is_available():
-        # 测试简单对话
-        print("\n🤖 测试简单对话...")
-        response = llm_client.generate_response("你好，收到请回复：'苟利国家生死以'")
+        # Test simple conversation
+        print("\n🤖 Testing simple conversation...")
+        response = llm_client.generate_content("Hello, if you receive this, please reply: 'I would do anything for my country'")
         if response:
-            print(f"✅ 收到响应: {response}")
+            print(f"✅ Received response: {response}")
         else:
-            print("❌ 未收到响应")
+            print("❌ No response received")
 
-        # 测试表格操作提示词
-        print("\n📊 测试表格操作提示词...")
+        # Test table operation prompt
+        print("\n📊 Testing table operation prompt...")
         table_manager = TableManager()
-        prompt_handler = PromptHandler(table_manager)
+        prompt_handler = PromptManager(table_manager)
 
-        # 生成包含表格数据的提示词
-        test_conversation = "[user]: 真银铃，你今天怎么样？\n[assistant]: 我很好，刚刚在音乐教室练歌。"
+        # Generate a prompt with table data
+        test_conversation = "[user]: How are you today, Zhen Yinling?\n[assistant]: I'm fine, I was just practicing a song in the music room."
         full_prompt = prompt_handler.generate_prompt_with_tables(test_conversation)
 
-        print(f"📝 生成的提示词长度: {len(full_prompt)} 字符")
+        print(f"📝 Generated prompt length: {len(full_prompt)} characters")
 
-        # 发送给Gemini
-        llm_response = llm_client.generate_response(full_prompt)
+        # Send to Gemini
+        llm_response = llm_client.generate_content(full_prompt)
 
         if llm_response:
-            print(f"✅ 收到LLM响应长度: {len(llm_response)} 字符")
-            print(f"📄 响应内容预览:\n{llm_response[:500]}...")
+            print(f"✅ Received LLM response length: {len(llm_response)} characters")
+            print(f"📄 Response content preview:\n{llm_response[:500]}...")
 
-            # 尝试解析表格操作
+            # Try to parse table operations
             operations = prompt_handler.extract_table_operations(llm_response)
-            print(f"🔧 解析到 {len(operations)} 个表格操作")
+            print(f"🔧 Parsed {len(operations)} table operations")
 
             if operations:
                 for i, op in enumerate(operations, 1):
                     print(f"  {i}. {op}")
 
-                # 执行操作
+                # Execute operations
                 results = prompt_handler.execute_operations(operations)
                 success_count = sum(results)
-                print(f"✅ 成功执行 {success_count}/{len(operations)} 个操作")
+                print(f"✅ Successfully executed {success_count}/{len(operations)} operations")
 
         else:
-            print("❌ 未收到LLM响应")
+            print("❌ No LLM response received")
 
     else:
-        print("⚠️ Gemini客户端不可用，请检查API密钥和网络连接")
+        print("⚠️ Gemini client not available, please check API key and network connection")
 
-    print("\n🎉 测试完成！")
+    print("\n🎉 Test complete!")
 
 except Exception as e:
-    print(f"❌ 测试失败: {e}")
+    print(f"❌ Test failed: {e}")
     import traceback
     traceback.print_exc()

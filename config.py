@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-配置管理模块
+Configuration management module
 """
 
 import os
 import logging
 
 # ===================
-# API配置
+# API Configuration
 # ===================
 
-# Gemini API配置
-# 支持多个API key轮换使用，避免单个key使用频率过高
+# Gemini API configuration
+# Supports multiple API key rotation to avoid high frequency usage of a single key
 GEMINI_API_KEYS = [
 ]
 
@@ -20,57 +20,57 @@ GEMINI_MODEL = "gemini-2.5-flash-preview-05-20"
 # GEMINI_MODEL = "gemini-2.0-flash-lite"
 
 # ===================
-# 穿甲增强(慎开)
+# Bypass Enhancement (Use with caution)
 # ===================
-BYPASS_ENHANCEMENT = True  # 是否开启穿甲增强
+BYPASS_ENHANCEMENT = True  # Whether to enable bypass enhancement
 
 # ===================
-# 表格生成配置
+# Table Generation Configuration
 # ===================
 
-# 上下文长度限制
-MAX_CONTEXT_LENGTH = 49  # 最大上下文长度，包括历史对话和当前用户输入
+# Context length limit
+MAX_CONTEXT_LENGTH = 49  # Maximum context length, including historical conversation and current user input
 
 # ===================
-# 表格压缩配置
+# Table Compression Configuration
 # ===================
 
-# 批处理大小
+# Batch size
 BATCH_SIZE = 50
 
-# 重叠大小（相邻批次之间的重叠行数）
+# Overlap size (number of overlapping rows between adjacent batches)
 OVERLAP_SIZE = 5
 
 # ===================
-# 项目路径配置
+# Project Path Configuration
 # ===================
 
-# 指定项目文件夹路径（如果为空或不存在，将在data目录下创建新文件夹）
-PROJECT_DIR_PATH = ""  # 设置为空，将自动创建新的时间戳文件夹
+# Specify the project folder path (if empty or non-existent, a new folder will be created in the data directory)
+PROJECT_DIR_PATH = ""  # Set to empty to automatically create a new timestamped folder
 
-# 数据根目录
+# Data root directory
 DATA_ROOT_DIR = "data"
 
-# 当前项目文件夹（动态设置）
+# Current project folder (dynamically set)
 CURRENT_PROJECT_FOLDER = ""
 
 # ===================
-# 输入输出路径配置
+# Input/Output Path Configuration
 # ===================
 
-# 输入文件路径
-INPUT_CHAT_FILE = os.path.join(DATA_ROOT_DIR, "chat.json")  # 输入聊天文件
-INPUT_TABLES_DIR = os.path.join(DATA_ROOT_DIR, "tables")  # 输入表格目录
+# Input file paths
+INPUT_CHAT_FILE = os.path.join(DATA_ROOT_DIR, "chat.json")  # Input chat file
+INPUT_TABLES_DIR = os.path.join(DATA_ROOT_DIR, "tables")  # Input tables directory
 
-# 输出根目录
+# Output root directory
 OUTPUT_ROOT_DIR = "result"
 
-# 不同模块的输出目录
+# Output directories for different modules
 CHAT_TO_TABLE_OUTPUT_DIR = os.path.join(OUTPUT_ROOT_DIR, "chat_to_table")
 TABLE_COMPRESSION_OUTPUT_DIR = os.path.join(OUTPUT_ROOT_DIR, "table_compression")
 
 # ===================
-# 日志配置
+# Logging Configuration
 # ===================
 
 LOG_LEVEL = logging.INFO
