@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-对话处理模块
-负责处理聊天数据的加载、解析和管理
+Conversation processing module
+Responsible for loading, parsing, and managing chat data
 """
 
 import json
@@ -9,7 +9,7 @@ import logging
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
-# 导入配置 - 更新为从根目录的config.py导入
+# Import configuration - updated to import from config.py in the root directory
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,35 +18,35 @@ from src.utils import get_chat_file_path
 
 @dataclass
 class ChatMessage:
-    """对话消息数据类"""
-    role: str  # 角色：user, assistant, system
-    content: str  # 消息内容
-    timestamp: Optional[str] = None  # 时间戳
-    metadata: Optional[Dict[str, Any]] = None  # 元数据
+    """Dataclass for a chat message"""
+    role: str  # Role: user, assistant, system
+    content: str  # Message content
+    timestamp: Optional[str] = None  # Timestamp
+    metadata: Optional[Dict[str, Any]] = None  # Metadata
 
 @dataclass
 class ChatRound:
-    """对话轮次数据类"""
-    round_id: int  # 轮次ID
-    messages: List[ChatMessage]  # 消息列表
-    summary: Optional[str] = None  # 轮次摘要
-    metadata: Optional[Dict[str, Any]] = None  # 元数据
+    """Dataclass for a conversation round"""
+    round_id: int  # Round ID
+    messages: List[ChatMessage]  # List of messages
+    summary: Optional[str] = None  # Round summary
+    metadata: Optional[Dict[str, Any]] = None  # Metadata
 
-class ChatProcessor:
-    """对话处理器类"""
+class ConversationProcessor:
+    """Conversation processor class"""
 
     def __init__(self):
-        """初始化对话处理器"""
+        """Initializes the conversation processor"""
         self.logger = logging.getLogger(__name__)
         self.chat_file = get_chat_file_path()
         self.chat_data: List[ChatRound] = []
 
     def load_chat_data(self) -> bool:
         """
-        从JSON文件加载对话数据
+        Loads conversation data from a JSON file
 
         Returns:
-            加载是否成功
+            Whether the loading was successful
         """
         try:
             with open(self.chat_file, 'r', encoding='utf-8') as f:
@@ -54,61 +54,61 @@ class ChatProcessor:
 
             self.chat_data = []
 
-            # 解析对话数据
+            # Parse conversation data
             if isinstance(data, list):
-                # 检查是否是简单的消息列表格式 [{"role": "user", "content": "..."}, ...]
+                # Check if it's a simple list of messages format [{"role": "user", "content": "..."}, ...]
                 if data and all(isinstance(item, dict) and "role" in item and "content" in item for item in data):
-                    # 简单消息列表格式，转换为单轮对话
+                    # Simple message list format, convert to a single conversation round
                     messages = [self._parse_message(msg_data) for msg_data in data]
                     chat_round = ChatRound(
                         round_id=1,
                         messages=[msg for msg in messages if msg is not None],
-                        summary="从简单消息列表加载的对话"
+                        summary="Conversation loaded from a simple message list"
                     )
                     self.chat_data.append(chat_round)
                 else:
-                    # 数据格式：[{round_id, messages, ...}, ...]
+                    # Data format: [{round_id, messages, ...}, ...]
                     for round_data in data:
                         chat_round = self._parse_chat_round(round_data)
                         if chat_round:
                             self.chat_data.append(chat_round)
             elif isinstance(data, dict):
-                # 数据格式：{"rounds": [...]} 或 {"messages": [...]}
+                # Data format: {"rounds": [...]} or {"messages": [...]}
                 if "rounds" in data:
                     for round_data in data["rounds"]:
                         chat_round = self._parse_chat_round(round_data)
                         if chat_round:
                             self.chat_data.append(chat_round)
                 elif "messages" in data:
-                    # 单轮对话格式
+                    # Single conversation round format
                     chat_round = ChatRound(
                         round_id=1,
                         messages=[self._parse_message(msg) for msg in data["messages"]]
                     )
                     self.chat_data.append(chat_round)
 
-            self.logger.info(f"成功加载 {len(self.chat_data)} 轮对话数据")
+            self.logger.info(f"Successfully loaded {len(self.chat_data)} conversation rounds")
             return True
 
         except FileNotFoundError:
-            self.logger.warning(f"对话文件不存在: {self.chat_file}")
+            self.logger.warning(f"Conversation file not found: {self.chat_file}")
             return False
         except json.JSONDecodeError as e:
-            self.logger.error(f"JSON解析失败: {e}")
+            self.logger.error(f"JSON parsing failed: {e}")
             return False
         except Exception as e:
-            self.logger.error(f"加载对话数据失败: {e}")
+            self.logger.error(f"Failed to load conversation data: {e}")
             return False
 
     def load_chat_data_from_file(self, file_path: str) -> bool:
         """
-        从指定文件加载对话数据
+        Loads conversation data from a specified file
 
         Args:
-            file_path: 文件路径
+            file_path: The file path
 
         Returns:
-            加载是否成功
+            Whether the loading was successful
         """
         original_file = self.chat_file
         self.chat_file = file_path
@@ -118,13 +118,13 @@ class ChatProcessor:
 
     def _parse_chat_round(self, round_data: Dict[str, Any]) -> Optional[ChatRound]:
         """
-        解析单轮对话数据
+        Parses a single conversation round data
 
         Args:
-            round_data: 轮次数据字典
+            round_data: The round data dictionary
 
         Returns:
-            ChatRound对象或None
+            A ChatRound object or None
         """
         try:
             round_id = round_data.get("round_id", round_data.get("id", 0))
@@ -144,21 +144,21 @@ class ChatProcessor:
             )
 
         except Exception as e:
-            self.logger.error(f"解析对话轮次失败: {e}")
+            self.logger.error(f"Failed to parse conversation round: {e}")
             return None
 
     def _parse_message(self, msg_data: Dict[str, Any]) -> Optional[ChatMessage]:
         """
-        解析单条消息数据
+        Parses a single message data
 
         Args:
-            msg_data: 消息数据字典
+            msg_data: The message data dictionary
 
         Returns:
-            ChatMessage对象或None
+            A ChatMessage object or None
         """
         try:
-            # 支持多种消息格式
+            # Support multiple message formats
             role = msg_data.get("role", msg_data.get("sender", "user"))
             content = msg_data.get("content", msg_data.get("text", ""))
 
@@ -170,18 +170,18 @@ class ChatProcessor:
             )
 
         except Exception as e:
-            self.logger.error(f"解析消息失败: {e}")
+            self.logger.error(f"Failed to parse message: {e}")
             return None
 
     def save_chat_data(self) -> bool:
         """
-        保存对话数据到JSON文件
+        Saves conversation data to a JSON file
 
         Returns:
-            保存是否成功
+            Whether the saving was successful
         """
         try:
-            # 转换为可序列化的格式
+            # Convert to a serializable format
             data = []
             for chat_round in self.chat_data:
                 round_data = {
@@ -203,26 +203,26 @@ class ChatProcessor:
             with open(self.chat_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
 
-            self.logger.info(f"成功保存对话数据到: {self.chat_file}")
+            self.logger.info(f"Successfully saved conversation data to: {self.chat_file}")
             return True
 
         except Exception as e:
-            self.logger.error(f"保存对话数据失败: {e}")
+            self.logger.error(f"Failed to save conversation data: {e}")
             return False
 
     def get_chat_rounds(self) -> List[ChatRound]:
-        """获取所有对话轮次"""
+        """Gets all conversation rounds"""
         return self.chat_data
 
     def get_chat_round_by_id(self, round_id: int) -> Optional[ChatRound]:
         """
-        根据ID获取指定对话轮次
+        Gets a specific conversation round by ID
 
         Args:
-            round_id: 轮次ID
+            round_id: The round ID
 
         Returns:
-            ChatRound对象或None
+            A ChatRound object or None
         """
         for chat_round in self.chat_data:
             if chat_round.round_id == round_id:
@@ -231,46 +231,46 @@ class ChatProcessor:
 
     def add_chat_round(self, chat_round: ChatRound) -> bool:
         """
-        添加新的对话轮次
+        Adds a new conversation round
 
         Args:
-            chat_round: 对话轮次对象
+            chat_round: The conversation round object
 
         Returns:
-            添加是否成功
+            Whether the addition was successful
         """
         try:
-            # 检查是否已存在相同ID的轮次
+            # Check if a round with the same ID already exists
             existing = self.get_chat_round_by_id(chat_round.round_id)
             if existing:
-                self.logger.warning(f"轮次ID {chat_round.round_id} 已存在，将覆盖")
+                self.logger.warning(f"Round ID {chat_round.round_id} already exists and will be overwritten")
                 self.chat_data = [r for r in self.chat_data if r.round_id != chat_round.round_id]
 
             self.chat_data.append(chat_round)
             self.chat_data.sort(key=lambda x: x.round_id)
 
-            self.logger.info(f"添加对话轮次: {chat_round.round_id}")
+            self.logger.info(f"Added conversation round: {chat_round.round_id}")
             return True
 
         except Exception as e:
-            self.logger.error(f"添加对话轮次失败: {e}")
+            self.logger.error(f"Failed to add conversation round: {e}")
             return False
 
     def get_latest_round(self) -> Optional[ChatRound]:
-        """获取最新的对话轮次"""
+        """Gets the latest conversation round"""
         if not self.chat_data:
             return None
         return max(self.chat_data, key=lambda x: x.round_id)
 
     def get_round_content_text(self, round_id: int) -> str:
         """
-        获取指定轮次的文本内容
+        Gets the text content of a specific round
 
         Args:
-            round_id: 轮次ID
+            round_id: The round ID
 
         Returns:
-            格式化的文本内容
+            The formatted text content
         """
         chat_round = self.get_chat_round_by_id(round_id)
         if not chat_round:
@@ -283,49 +283,49 @@ class ChatProcessor:
         return "\n".join(content_parts)
 
     def get_all_content_text(self) -> str:
-        """获取所有对话内容的文本"""
+        """Gets the text content of all conversations"""
         content_parts = []
         for chat_round in self.chat_data:
-            content_parts.append(f"=== 轮次 {chat_round.round_id} ===")
+            content_parts.append(f"=== Round {chat_round.round_id} ===")
             content_parts.append(self.get_round_content_text(chat_round.round_id))
             content_parts.append("")
 
         return "\n".join(content_parts)
 
     def create_example_chat_file(self):
-        """创建示例对话文件"""
+        """Creates an example conversation file"""
         example_data = [
             {
                 "round_id": 1,
                 "messages": [
                     {
                         "role": "user",
-                        "content": "真银铃，你今天感觉怎么样？",
+                        "content": "How are you feeling today?",
                         "timestamp": "2024-01-01 10:00:00"
                     },
                     {
                         "role": "assistant",
-                        "content": "我今天感觉还不错，刚刚在学校的音乐教室练习了一首新歌。你呢？",
+                        "content": "I'm feeling pretty good, I just practiced a new song in the school's music room. How about you?",
                         "timestamp": "2024-01-01 10:01:00"
                     }
                 ],
-                "summary": "询问真银铃的状态，她提到在音乐教室练歌"
+                "summary": "Asked about the assistant's status, they mentioned practicing a song in the music room"
             },
             {
                 "round_id": 2,
                 "messages": [
                     {
                         "role": "user",
-                        "content": "悠悠也在那里吗？我看到她最近很关心你。",
+                        "content": "Is Yoyo there too? I saw she's been very concerned about you lately.",
                         "timestamp": "2024-01-01 10:02:00"
                     },
                     {
                         "role": "assistant",
-                        "content": "是的，悠悠刚才还帮我调试音响设备。她确实很关心我，我们是很好的朋友。",
+                        "content": "Yes, Yoyo just helped me adjust the audio equipment. She is indeed very concerned about me, we are good friends.",
                         "timestamp": "2024-01-01 10:03:00"
                     }
                 ],
-                "summary": "讨论悠悠对真银铃的关心，确认了她们的友好关系"
+                "summary": "Discussed Yoyo's concern for the assistant, confirming their friendly relationship"
             }
         ]
 
@@ -336,17 +336,17 @@ class ChatProcessor:
             with open(self.chat_file, 'w', encoding='utf-8') as f:
                 json.dump(example_data, f, ensure_ascii=False, indent=2)
 
-            self.logger.info(f"创建示例对话文件: {self.chat_file}")
+            self.logger.info(f"Created example conversation file: {self.chat_file}")
 
         except Exception as e:
-            self.logger.error(f"创建示例对话文件失败: {e}")
+            self.logger.error(f"Failed to create example conversation file: {e}")
 
     def get_message_pairs(self) -> List[List[ChatMessage]]:
         """
-        获取用户-助手消息对列表
+        Gets a list of user-assistant message pairs
 
         Returns:
-            消息对列表，每个消息对包含一个user消息和一个assistant消息
+            A list of message pairs, each containing a user message and an assistant message
         """
         pairs = []
 
@@ -355,17 +355,17 @@ class ChatProcessor:
 
             for message in chat_round.messages:
                 if message.role == "user":
-                    # 如果当前对不为空，说明之前有未完成的对话，先保存
+                    # If the current pair is not empty, it means there was an unfinished conversation, so save it first
                     if current_pair:
                         pairs.append(current_pair)
                     current_pair = [message]
                 elif message.role == "assistant" and current_pair:
-                    # 添加assistant响应到当前对
+                    # Add the assistant's response to the current pair
                     current_pair.append(message)
                     pairs.append(current_pair)
                     current_pair = []
 
-            # 处理只有user消息没有assistant响应的情况
+            # Handle cases where there is only a user message without an assistant response
             if current_pair:
                 pairs.append(current_pair)
 
@@ -373,20 +373,20 @@ class ChatProcessor:
 
     def get_conversation_history_up_to_pair(self, pair_index: int) -> str:
         """
-        获取到指定消息对为止的所有历史对话内容
+        Gets all historical conversation content up to a specified message pair
 
         Args:
-            pair_index: 消息对索引
+            pair_index: The message pair index
 
         Returns:
-            格式化的历史对话内容
+            The formatted historical conversation content
         """
         pairs = self.get_message_pairs()
         history_pairs = pairs[:pair_index]
 
         conversation_text = ""
         for i, pair in enumerate(history_pairs):
-            conversation_text += f"=== 第{i+1}轮对话 ===\n"
+            conversation_text += f"=== Round {i+1} ===\n"
             for message in pair:
                 conversation_text += f"[{message.role}]: {message.content}\n"
             conversation_text += "\n"
@@ -395,20 +395,20 @@ class ChatProcessor:
 
     def get_current_pair_content(self, pair_index: int) -> str:
         """
-        获取当前消息对的内容
+        Gets the content of the current message pair
 
         Args:
-            pair_index: 消息对索引
+            pair_index: The message pair index
 
         Returns:
-            当前消息对的格式化内容
+            The formatted content of the current message pair
         """
         pairs = self.get_message_pairs()
         if pair_index >= len(pairs):
             return ""
 
         current_pair = pairs[pair_index]
-        content = f"=== 当前轮对话 ===\n"
+        content = f"=== Current Round ===\n"
         for message in current_pair:
             content += f"[{message.role}]: {message.content}\n"
 
