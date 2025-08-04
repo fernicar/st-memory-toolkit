@@ -15,9 +15,9 @@ import logging
 GEMINI_API_KEYS = [
 ]
 
-GEMINI_MODEL = "gemini-2.5-flash-preview-05-20"
-# GEMINI_MODEL = "gemini-2.0-flash"
-# GEMINI_MODEL = "gemini-2.0-flash-lite"
+GEMINI_MODEL = "gemini-2.5-flash-lite"
+# GEMINI_MODEL = "gemini-2.5-flash"
+# GEMINI_MODEL = "gemini-2.5-flash-lite"
 
 # ===================
 # Bypass Enhancement (Use with caution)

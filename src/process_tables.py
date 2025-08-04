@@ -7,7 +7,7 @@ import os
 import csv
 import json
 import uuid
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 
 class CSVTableConverter:
@@ -99,8 +99,8 @@ class CSVTableConverter:
                 if file_name == "social_relations_table.csv" and len(header) > 1:
                     # Replace "真银铃" with "<user>" in the header
                     for i in range(1, len(header)):
-                        if header[i] and "真银铃" in header[i]:
-                            header[i] = header[i].replace("真银铃", "<user>")
+                        if header[i] and "真银铃" in str(header[i]):
+                            header[i] = str(header[i]).replace("真银铃", "<user>")
 
                 content.append(header)
 
@@ -206,7 +206,7 @@ class CSVTableConverter:
             return False
 
 
-def process_tables_in_directory(tables_dir: str, output_file: str = None) -> Dict[str, Any]:
+def process_tables_in_directory(tables_dir: str, output_file: Optional[str] = None) -> Dict[str, Any]:
     """
     Processes table files in a specified directory
 

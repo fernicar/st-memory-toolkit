@@ -9,6 +9,7 @@ import logging
 import shutil
 import pandas as pd
 from datetime import datetime
+from typing import Optional
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -383,7 +384,7 @@ def save_compression_interaction(output_path: str, prompt: str, response: str, i
 
 
 def save_compression_operations_analysis(output_path: str, llm_response: str,
-                                         operations: list, execution_results: list) -> str:
+                                         operations: list, execution_results: list) -> Optional[str]:
     """Save table compression operation analysis results to a file."""
     try:
         # Create an operation analysis record
@@ -591,7 +592,7 @@ def main():
                     interaction_file = save_compression_interaction(
                         output_path,
                         f"Batch {batch_num + 1}:\n{compression_prompt}",
-                        llm_response,
+                        llm_response if llm_response is not None else "",
                         is_mock
                     )
 
@@ -674,7 +675,7 @@ def main():
             # Execute table processing, convert to JSON format
             console.print(f"\n[bold blue]📊 Starting table data conversion...[/bold blue]")
             try:
-                from src.table_converter import process_tables_in_directory
+                from process_tables import process_tables_in_directory
                 
                 # Generate JSON formatted table file and save it to the current output folder
                 tables_dir = os.path.join(output_path, "tables")

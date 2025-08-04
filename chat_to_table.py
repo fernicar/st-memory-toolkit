@@ -6,6 +6,7 @@ Large Language Model Tabular Memory System - Main Program
 import os
 import json
 import logging
+from typing import Optional
 from datetime import datetime
 from rich.console import Console
 from rich.panel import Panel
@@ -76,7 +77,7 @@ def save_llm_interaction(output_path: str, prompt: str, response: str, is_mock: 
 
 
 def save_table_operations_analysis(output_path: str, round_index: int, llm_response: str,
-                                   operations: list, execution_results: list) -> str:
+                                   operations: list, execution_results: list) -> Optional[str]:
     """Save table operation analysis results to a file"""
     try:
         # Create an operation analysis record
@@ -311,7 +312,7 @@ def main():
         # Execute table processing, convert to JSON format
         console.print(f"\n[bold blue]📊 Starting table data conversion...[/bold blue]")
         try:
-            from src.table_converter import process_tables_in_directory
+            from process_tables import process_tables_in_directory
             
             # Generate JSON formatted table file and save it to the current output folder
             tables_dir = os.path.join(output_path, "tables")

@@ -11,6 +11,7 @@ from typing import List, Dict, Any, Optional, Tuple
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from typing import Optional
 from prompt import MEMORY_TABLE_PROMPT, MEMORY_TABLE_PROMPT_INTEGRATION, BYPASSING_CONTENT_FILTERS_PROMPT, END_PROMPT, BYPASSING_CONTENT_FILTERS_PROMPT_MODEL  # Import system prompts and filter bypass prompts from prompt.py
 from config import MAX_CONTEXT_LENGTH, BYPASS_ENHANCEMENT  # Import max context length configuration
 from src.table_manager import TableManager
@@ -44,7 +45,7 @@ class PromptManager:
         self.table_manager = table_manager
         self.system_prompt = MEMORY_TABLE_PROMPT
 
-    def generate_prompt_with_tables(self, conversation_text: str, current_user_input: str = "", current_round: int = 0, use_integration_prompt: bool = False, input_tables_dir: str = None, batch_df=None) -> str:
+    def generate_prompt_with_tables(self, conversation_text: str, current_user_input: str = "", current_round: int = 0, use_integration_prompt: bool = False, input_tables_dir: Optional[str] = None, batch_df=None) -> str:
         """
         Generates a prompt with table status, using the contents array format
 
@@ -1176,5 +1177,3 @@ class PromptManager:
         except Exception as e:
             self.logger.error(f"Failed to format batch data: {e}")
             return ""
-
-[end of src/prompt_manager.py]
